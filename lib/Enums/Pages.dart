@@ -1,0 +1,5 @@
+enum Pages
+{
+  ListRegistrations,
+  ListOfProjects
+}
