@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled2/Enums/Pages.dart';
 import 'package:untitled2/NewRegistrationsPage.dart';
@@ -100,7 +98,7 @@ class MainPage extends State<MyHomePage> {
         notchMargin: 5,
         child: Row(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Container(
               padding: EdgeInsets.all(5),

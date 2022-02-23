@@ -1,9 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:untitled2/ListViewRegistrations.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
-class NewRegistrationPage extends StatelessWidget {
+import 'Objects/Registration.dart';
+
+Registration? registration = null;
+
+class NewRegistrationPage extends StatefulWidget {
+  NewRegistrationPage({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _NewRegistrationPage();
+  }
+}
+
+class _NewRegistrationPage extends State<NewRegistrationPage> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -13,19 +25,99 @@ class NewRegistrationPage extends StatelessWidget {
           // the App.build method, and use it to set our appbar title.
           title: Text("Nowe zgłoszenie"),
         ),
-        body:Column(
+        body: Column(
           children: [
             Container(
-          margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-          child:  TextField(
-            obscureText: true,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Password',
+              margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Temat',
+                ),
+              ),
             ),
-          ),
-            ),
-      ],
+            Container(
+                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                child: CustomDropdownButton()),
+            Expanded(
+                child: Container(
+                    margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                    child: TextField(
+                        minLines: 10,
+                        maxLines: 30,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          hintText: "Opis",
+                      border: OutlineInputBorder(),
+                    )))),
+          ],
         ));
+  }
+}
+
+class CustomDropdownButton extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return CustomDropdownButtonState();
+  }
+}
+
+class CustomDropdownButtonState extends State<CustomDropdownButton> {
+  String? selectedValue = null;
+  List<String> items = [
+    'Item1',
+    'Item2',
+    'Item3',
+    'Item4',
+    'Item5',
+    'Item6',
+    'Item7',
+    'Item8',
+    'Item10'
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonHideUnderline(
+      child: DropdownButton2(
+        isExpanded: true,
+        hint: Text('Wybierz program'),
+        items: items
+            .map((item) => DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(
+                    item,
+                  ),
+                ))
+            .toList(),
+        value: selectedValue,
+        onChanged: (value) {
+          setState(() {
+            selectedValue = value as String;
+          });
+        },
+        icon: const Icon(
+          Icons.arrow_forward_ios_outlined,
+        ),
+        iconSize: 14,
+        iconEnabledColor: Colors.black,
+        iconDisabledColor: Colors.grey,
+        buttonHeight: 60,
+        buttonPadding: const EdgeInsets.only(left: 14, right: 14),
+        buttonDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: Colors.grey,
+          ),
+        ),
+        itemHeight: 60,
+        itemPadding: const EdgeInsets.only(left: 14, right: 14),
+        dropdownMaxHeight: 200,
+        dropdownPadding: null,
+        dropdownElevation: 8,
+        scrollbarThickness: 6,
+        scrollbarAlwaysShow: true,
+      ),
+    );
   }
 }
