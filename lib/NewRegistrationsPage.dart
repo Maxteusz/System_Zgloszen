@@ -16,6 +16,30 @@ class NewRegistrationPage extends StatefulWidget {
 }
 
 class _NewRegistrationPage extends State<NewRegistrationPage> {
+  List<String> items = [
+    'Item1',
+    'Item2',
+    'Item3',
+    'Item4',
+    'Item5',
+    'Item6',
+    'Item7',
+    'Item8',
+    'Item10'
+  ];
+
+  List<String> items2 = [
+    'Item6',
+    'Item6',
+    'Item35',
+    'Item4',
+    'Item5',
+    'Item6',
+    'Item7',
+    'Item8',
+    'Item10'
+  ];
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -38,7 +62,10 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
             ),
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: CustomDropdownButton()),
+                child: ProgramsDropDownButton(items, "Wybierz program")),
+            Container(
+                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                child: ProgramsDropDownButton(items2,"Wybierz projekt")),
             Expanded(
                 child: Container(
                     margin: EdgeInsets.only(top: 10, left: 10, right: 10),
@@ -55,33 +82,28 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
   }
 }
 
-class CustomDropdownButton extends StatefulWidget {
+class ProgramsDropDownButton extends StatefulWidget {
+  List<String> items = [];
+  String label;
+  ProgramsDropDownButton(this.items,this.label);
   @override
   State<StatefulWidget> createState() {
-    return CustomDropdownButtonState();
+    return ProgramsDropDownButtonState(items, label);
   }
 }
 
-class CustomDropdownButtonState extends State<CustomDropdownButton> {
+class ProgramsDropDownButtonState extends State<ProgramsDropDownButton> {
+String label;
   String? selectedValue = null;
-  List<String> items = [
-    'Item1',
-    'Item2',
-    'Item3',
-    'Item4',
-    'Item5',
-    'Item6',
-    'Item7',
-    'Item8',
-    'Item10'
-  ];
+  List<String> items = [];
+  ProgramsDropDownButtonState(this.items,this.label);
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonHideUnderline(
       child: DropdownButton2(
         isExpanded: true,
-        hint: Text('Wybierz program'),
+        hint: Text(label),
         items: items
             .map((item) => DropdownMenuItem<String>(
                   value: item,
