@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled2/Enums/Pages.dart';
-import 'package:untitled2/NewRegistrationsPage.dart';
+import 'package:untitled2/Pages/NewRegistrationsPage/NewRegistrationsPage.dart';
 import 'package:untitled2/Objects/Registration.dart';
-import 'ListViewRegistrations.dart';
+import 'Pages/ListMyRegistrations/ListViewRegistrations.dart';
 
 void main() {
   runApp(const MyApp());

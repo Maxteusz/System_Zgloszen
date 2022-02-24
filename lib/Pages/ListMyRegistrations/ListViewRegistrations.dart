@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled2/CardListViewRegistraion.dart';
-import 'Objects/Registration.dart';
+import 'package:untitled2/Pages/ListMyRegistrations/CardListViewRegistraion.dart';
+import '../../Objects/Registration.dart';
 
 class ListViewRegistrations extends StatelessWidget {
   List <Registration> registrations = <Registration>[];

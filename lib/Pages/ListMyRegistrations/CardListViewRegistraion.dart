@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'Objects/Registration.dart';
+import '../../Objects/Registration.dart';
 
 class CardListViewRegistraion extends StatelessWidget {
   Registration registraion;

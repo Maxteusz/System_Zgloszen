@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
-import 'Objects/Registration.dart';
+import '../../Objects/Registration.dart';
 
 Registration? registration = null;
 
