@@ -62,10 +62,10 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
             ),
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: ProgramsDropDownButton(items, "Wybierz program")),
+                child: ProgramsDropDownButton(items, "Wybierz projekt")),
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: ProgramsDropDownButton(items2,"Wybierz projekt")),
+                child: ProgramsDropDownButton(items2,"Wybierz osobę")),
             Expanded(
                 child: Container(
                     margin: EdgeInsets.only(top: 10, left: 10, right: 10),
