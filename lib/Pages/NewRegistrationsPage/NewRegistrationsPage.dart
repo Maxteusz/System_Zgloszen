@@ -85,7 +85,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                 minWidth: 100,
                 onPressed: () {  },
                 child: Text("Dodaj",
-                style: TextStyle(
+                  style: TextStyle(
                   color: Colors.white,
                 ),),
                 color: Colors.blue,
