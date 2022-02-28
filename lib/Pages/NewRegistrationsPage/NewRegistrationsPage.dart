@@ -28,14 +28,11 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
     'Item10'
   ];
 
-  List<String> items2 = [
-    'Item6',
-    'Item35',
-    'Item4',
-    'Item5',
-    'Item7',
-    'Item8',
-    'Item10'
+  List<String> userList = [
+    'Mateusz Chabiński',
+    'Michał Kruk',
+    'Mateusz Drobiec',
+    'Marek Korzec'
   ];
 
   @override
@@ -64,7 +61,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                 child: ProgramsDropDownButton(items, "Wybierz projekt")),
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: ProgramsDropDownButton(items2, "Wybierz osobę")),
+                child: ProgramsDropDownButton(userList, "Wybierz osobę")),
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
                 child: TextField(
@@ -77,7 +74,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                     ))),
             Container(
                 margin: EdgeInsets.only(right: 10, left: 10, top: 10),
-                child: AddPeopleDropDownButton(items, "Dodaj użytkowników")),
+                child: AddUserDropDownButton(userList, "Dodaj użytkowników")),
             Container(
               margin: EdgeInsets.only(bottom: 10),
               child: MaterialButton(
@@ -162,25 +159,25 @@ class ProgramsDropDownButtonState extends State<ProgramsDropDownButton> {
   }
 }
 
-class AddPeopleDropDownButton extends StatefulWidget {
+class AddUserDropDownButton extends StatefulWidget {
   List<String> items = [];
   String label;
 
-  AddPeopleDropDownButton(this.items, this.label);
+  AddUserDropDownButton(this.items, this.label);
 
   @override
   State<StatefulWidget> createState() {
-    return AddPeopleDropDownButtonState(items, label);
+    return AddUserDropDownButtonState(items, label);
   }
 }
 
-class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
+class AddUserDropDownButtonState extends State<AddUserDropDownButton> {
   String label;
   String? selectedValue = null;
   List<String> items = [];
   List<String> people = [];
 
-  AddPeopleDropDownButtonState(this.items, this.label);
+  AddUserDropDownButtonState(this.items, this.label);
 
   @override
   Widget build(BuildContext context) {
@@ -202,6 +199,7 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
             onChanged: (value) {
               setState(() {
                 selectedValue = value as String;
+                if(!people.contains(value))
                 people.add(value);
                 selectedValue = null;
               });
@@ -236,13 +234,18 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
               itemCount: people.length,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
-                  color: Colors.orange[50],
+
+                  decoration:   BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.blue[50],),
                   margin: EdgeInsets.only(left: 10, top: 10, right: 10),
                   child: Row(
                     children: [
                       Container(
                           margin: EdgeInsets.only(left: 10),
-                          child: Text(people[index])),
+                          child: Container(
+                            margin: EdgeInsets.only(top: 10, bottom: 10),
+                              child:Text(people[index]))),
                       Container(
                           margin: EdgeInsets.only(left: 10),
                           child: InkWell(
@@ -251,7 +254,7 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
                                 people.removeAt(index);
                               });
                             },
-                            child: Icon(Icons.remove_circle_outline),
+                            child: Icon(Icons.person_remove_rounded),
                           )),
                     ],
                   ),
