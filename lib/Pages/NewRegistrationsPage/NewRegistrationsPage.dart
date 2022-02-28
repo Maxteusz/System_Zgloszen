@@ -65,7 +65,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
                 child: TextField(
-                    minLines: 10,
+                    minLines: 5,
                     maxLines: 30,
                     keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
@@ -76,7 +76,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                 margin: EdgeInsets.only(right: 10, left: 10, top: 10),
                 child: AddUserDropDownButton(userList, "Dodaj użytkowników")),
             Container(
-              margin: EdgeInsets.only(bottom: 10),
+              margin: EdgeInsets.only(bottom: 10, top: 10),
               child: MaterialButton(
                 height: 40,
                 minWidth: 100,
