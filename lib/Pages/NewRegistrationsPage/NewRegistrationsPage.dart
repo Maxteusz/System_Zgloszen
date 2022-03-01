@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:http/http.dart' as http;
+
 import '../../Objects/Registration.dart';
-import '../../Objects/User.dart';
 
 Registration? registration = null;
 
@@ -41,38 +38,6 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
     'Item10'
   ];
 
-
-  List<User> users = [];
-  late Future<List<User>> futureUsers;
-
-
-
-  Future<List<User>> getUserList() async {
-    final response = await http.get(
-        Uri.parse('http://192.168.1.133:5009/PobierzListeUzytkownikow'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        });
-
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      users = body.map((e) => User.fromJson(e)).toList();
-      return users;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to list Suit');
-    }
-  }
-
-
-  @override
-  void initState() {
-    super.initState();
-    futureUsers = getUserList();
-
-  }
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -94,19 +59,9 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                 ),
               ),
             ),
-            FutureBuilder<List<User>>(
-              future: futureUsers,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Container(
-                      margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                      child: AddPeopleDropDownButton(snapshot.data!, "Wybierz projekt"));
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
-                return Text("Nie pobrano użytkowników");
-              },
-            ),
+            Container(
+                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                child: ProgramsDropDownButton(items, "Wybierz projekt")),
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
                 child: ProgramsDropDownButton(items2, "Wybierz osobę")),
@@ -208,7 +163,7 @@ class ProgramsDropDownButtonState extends State<ProgramsDropDownButton> {
 }
 
 class AddPeopleDropDownButton extends StatefulWidget {
-  List<User> items = [];
+  List<String> items = [];
   String label;
 
   AddPeopleDropDownButton(this.items, this.label);
@@ -223,10 +178,9 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
   String label;
   String? selectedValue = null;
   List<String> items = [];
+  List<String> people = [];
 
-  List<User> users = [];
-  AddPeopleDropDownButtonState(this.users, this.label);
-
+  AddPeopleDropDownButtonState(this.items, this.label);
 
   @override
   Widget build(BuildContext context) {
@@ -248,7 +202,7 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
             onChanged: (value) {
               setState(() {
                 selectedValue = value as String;
-
+                people.add(value);
                 selectedValue = null;
               });
             },
@@ -279,7 +233,7 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
           height: 150,
           child: ListView.builder(
               shrinkWrap: true,
-              itemCount: users.length,
+              itemCount: people.length,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
                   color: Colors.orange[50],
@@ -288,13 +242,13 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
                     children: [
                       Container(
                           margin: EdgeInsets.only(left: 10),
-                          child: Text(users[index].Name)),
+                          child: Text(people[index])),
                       Container(
                           margin: EdgeInsets.only(left: 10),
                           child: InkWell(
                             onTap: () {
                               setState(() {
-                                users.removeAt(index);
+                                people.removeAt(index);
                               });
                             },
                             child: Icon(Icons.remove_circle_outline),
