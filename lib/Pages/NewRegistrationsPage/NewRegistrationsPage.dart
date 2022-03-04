@@ -35,6 +35,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
 
 
   Future<List<User>> fetchUsers() async {
+    users.clear();
     final response = await http
         .get(Uri.parse('http://10.1.2.74:5009/PobierzListeUzytkownikow'));
 
@@ -152,6 +153,11 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
             )
           ],
         )));
+  }
+
+   @override
+  void dispose() {
+users.clear();
   }
 }
 
@@ -274,6 +280,7 @@ class DropDownButton extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
+
     return DropDownButtonState(users, label);
   }
 }
