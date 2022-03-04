@@ -16,6 +16,8 @@ import '../../Objects/User.dart';
 List<User> attachedUsersList = [];
 List<AttachedPeople> _attachedUsersList = [];
 User? selectedOwner;
+TextEditingController titleController = TextEditingController();
+TextEditingController descriptionController = TextEditingController();
 
 class NewRegistrationPage extends StatefulWidget {
   NewRegistrationPage({Key? key}) : super(key: key);
@@ -49,7 +51,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
   }
    void send() async {
      Registration registration = new Registration.rere(
-         "fdfdfd", selectedOwner!.Id, 1, "program", "title", _attachedUsersList);
+         descriptionController.text, selectedOwner!.Id, 1, "program", titleController.text, _attachedUsersList);
      var response = await http.post(
          Uri.http('10.1.2.74:5009', '/DodajZgloszenie/'),
          headers: {"Content-type": "application/json"},
@@ -85,6 +87,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
             Container(
               margin: EdgeInsets.only(top: 10, left: 10, right: 10),
               child: TextField(
+                controller: titleController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Temat',
@@ -107,6 +110,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
                 child: TextField(
+                  controller: descriptionController,
                     minLines: 10,
                     maxLines: 30,
                     keyboardType: TextInputType.multiline,
