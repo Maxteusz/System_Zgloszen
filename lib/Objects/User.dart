@@ -17,4 +17,10 @@ class User{
       Surname: json['nazwisko'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'Id': Id,
+    'imie': Name,
+    'nazwisko': Surname,
+  };
 }

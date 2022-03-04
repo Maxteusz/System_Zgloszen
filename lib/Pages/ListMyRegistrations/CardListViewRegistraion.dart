@@ -33,7 +33,7 @@ class CardListViewRegistraion extends StatelessWidget {
                         ),
                         Container(
                             margin: EdgeInsets.only(top: 5),
-                            child: Text(registraion.owner)),
+                            child: Text("registraion.owner.getName())")),
                       ],
                     )),
                 Container(

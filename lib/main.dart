@@ -60,11 +60,7 @@ class MainPage extends State<MyHomePage> {
   String title = "Zgłoszenia";
   List<Registration> registrations = <Registration>[];
 
-  void testaddRegistrations() {
-    for (int i = 1; i < 4450; i++)
-      registrations.add(new Registration(
-          i, "opis", "Mateusz Chabiński", "MTomanek", "IOffice", "temat"));
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +70,7 @@ class MainPage extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    testaddRegistrations();
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
