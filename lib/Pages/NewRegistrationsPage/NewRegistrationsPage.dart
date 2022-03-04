@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:http/http.dart' as http;
+import 'dart:developer';
 
 import '../../Objects/Registration.dart';
+import '../../Objects/User.dart';
 
 Registration? registration = null;
 
@@ -16,27 +21,32 @@ class NewRegistrationPage extends StatefulWidget {
 }
 
 class _NewRegistrationPage extends State<NewRegistrationPage> {
-  List<String> items = [
-    'Item1',
-    'Item2',
-    'Item3',
-    'Item4',
-    'Item5',
-    'Item6',
-    'Item7',
-    'Item8',
-    'Item10'
-  ];
 
-  List<String> items2 = [
-    'Item6',
-    'Item35',
-    'Item4',
-    'Item5',
-    'Item7',
-    'Item8',
-    'Item10'
-  ];
+   late Future<List<User>> futureUsers;
+   late List<User> users = [];
+
+
+  Future<List<User>> fetchUsers() async {
+    final response = await http
+        .get(Uri.parse('http://10.1.2.74:5009/PobierzListeUzytkownikow'));
+
+    if (response.statusCode == 200) {
+      var responseJson = json.decode(response.body);
+      log("Response Body: $responseJson" );
+      users = (responseJson as List).map((p) => User.fromJson(p)).toList();
+      return users;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    futureUsers = fetchUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +58,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
           title: Text("Nowe zgłoszenie"),
         ),
         body: SingleChildScrollView(
-        child:Column(
+            child: Column(
           children: [
             Container(
               margin: EdgeInsets.only(top: 10, left: 10, right: 10),
@@ -59,12 +69,19 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                 ),
               ),
             ),
+           /* Container(
+                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                //child: ProgramsDropDownButton(items, "Wybierz projekt")),*/
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: ProgramsDropDownButton(items, "Wybierz projekt")),
-            Container(
-                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: ProgramsDropDownButton(items2, "Wybierz osobę")),
+                child: FutureBuilder<List<User>>(
+                    future: futureUsers,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return DropDownButton(snapshot.data!, "Wybierz użytkownika");
+                      } else
+                        return Text('${snapshot.error}');
+                    })),
             Container(
                 margin: EdgeInsets.only(top: 10, left: 10, right: 10),
                 child: TextField(
@@ -77,19 +94,27 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                     ))),
             Container(
                 margin: EdgeInsets.only(right: 10, left: 10, top: 10),
-                child: AddPeopleDropDownButton(items, "Dodaj użytkowników")),
+                child: FutureBuilder<List<User>>(
+                    future: futureUsers,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return AddPeopleDropDownButton(snapshot.data!, "Dodaj użytkownika");
+                      } else
+                        return Text('${snapshot.error}');
+                    })),
             Container(
               margin: EdgeInsets.only(bottom: 10),
               child: MaterialButton(
                 height: 40,
                 minWidth: 100,
-                onPressed: () {  },
-                child: Text("Dodaj",
+                onPressed: () {},
+                child: Text(
+                  "Dodaj",
                   style: TextStyle(
-                  color: Colors.white,
-                ),),
+                    color: Colors.white,
+                  ),
+                ),
                 color: Colors.blue,
-
               ),
             )
           ],
@@ -97,24 +122,24 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
   }
 }
 
-class ProgramsDropDownButton extends StatefulWidget {
-  List<String> items = [];
+class DropDownButton extends StatefulWidget {
   String label;
+  List<User> users = [];
 
-  ProgramsDropDownButton(this.items, this.label);
+  DropDownButton(this.users, this.label);
 
   @override
   State<StatefulWidget> createState() {
-    return ProgramsDropDownButtonState(items, label);
+    return DropDownButtonState(users, label);
   }
 }
 
-class ProgramsDropDownButtonState extends State<ProgramsDropDownButton> {
+class DropDownButtonState extends State<DropDownButton> {
   String label;
-  String? selectedValue = null;
-  List<String> items = [];
+  User? selectedValue = null;
+  List<User> users = [];
 
-  ProgramsDropDownButtonState(this.items, this.label);
+  DropDownButtonState(this.users, this.label);
 
   @override
   Widget build(BuildContext context) {
@@ -122,18 +147,18 @@ class ProgramsDropDownButtonState extends State<ProgramsDropDownButton> {
       child: DropdownButton2(
         isExpanded: true,
         hint: Text(label),
-        items: items
-            .map((item) => DropdownMenuItem<String>(
+        items: users
+            .map((item) => DropdownMenuItem<User>(
                   value: item,
                   child: Text(
-                    item,
+                    item.getName(),
                   ),
                 ))
             .toList(),
         value: selectedValue,
         onChanged: (value) {
           setState(() {
-            selectedValue = value as String;
+            selectedValue = value as User;
           });
         },
         icon: const Icon(
@@ -163,24 +188,25 @@ class ProgramsDropDownButtonState extends State<ProgramsDropDownButton> {
 }
 
 class AddPeopleDropDownButton extends StatefulWidget {
-  List<String> items = [];
+
+  List<User> users = [];
   String label;
 
-  AddPeopleDropDownButton(this.items, this.label);
+  AddPeopleDropDownButton(this.users, this.label);
 
   @override
   State<StatefulWidget> createState() {
-    return AddPeopleDropDownButtonState(items, label);
+    return AddPeopleDropDownButtonState(users, label);
   }
 }
 
 class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
   String label;
-  String? selectedValue = null;
-  List<String> items = [];
-  List<String> people = [];
+  User? selectedValue = null;
+  List<User> users = [];
+  List<User> attachedUsers = [];
 
-  AddPeopleDropDownButtonState(this.items, this.label);
+  AddPeopleDropDownButtonState(this.users, this.label);
 
   @override
   Widget build(BuildContext context) {
@@ -190,19 +216,20 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
           child: DropdownButton2(
             isExpanded: true,
             hint: Text(label),
-            items: items
-                .map((item) => DropdownMenuItem<String>(
-                      value: item,
+            items: users
+                .map((user) => DropdownMenuItem<User>(
+                      value: user,
                       child: Text(
-                        item,
+                        user.getName(),
                       ),
                     ))
                 .toList(),
             value: selectedValue,
             onChanged: (value) {
               setState(() {
-                selectedValue = value as String;
-                people.add(value);
+                selectedValue = value as User;
+                if(!attachedUsers.contains(value))
+                attachedUsers.add(value);
                 selectedValue = null;
               });
             },
@@ -220,7 +247,7 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
                 color: Colors.grey,
               ),
             ),
-            itemHeight: 60,
+            itemHeight: 40,
             itemPadding: const EdgeInsets.only(left: 14, right: 14),
             dropdownMaxHeight: 200,
             dropdownPadding: null,
@@ -233,22 +260,27 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
           height: 150,
           child: ListView.builder(
               shrinkWrap: true,
-              itemCount: people.length,
+              itemCount: attachedUsers.length,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
-                  color: Colors.orange[50],
+
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.blue[50],
+                  ),
+
                   margin: EdgeInsets.only(left: 10, top: 10, right: 10),
                   child: Row(
                     children: [
                       Container(
-                          margin: EdgeInsets.only(left: 10),
-                          child: Text(people[index])),
+                          margin: EdgeInsets.only(left: 10,top: 10, bottom: 10),
+                          child: Text(attachedUsers[index].getName())),
                       Container(
                           margin: EdgeInsets.only(left: 10),
                           child: InkWell(
                             onTap: () {
                               setState(() {
-                                people.removeAt(index);
+                                attachedUsers.removeAt(index);
                               });
                             },
                             child: Icon(Icons.remove_circle_outline),

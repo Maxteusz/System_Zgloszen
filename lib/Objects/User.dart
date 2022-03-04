@@ -5,11 +5,16 @@ class User{
 
   User({required this.Id, required this.Name,required this.Surname});
 
+  String getName ()
+  {
+    return this.Name + " " + this.Surname;
+  }
+
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       Id: json['id'],
-      Name: json['title'],
-      Surname: json['title'],
+      Name: json['imie'],
+      Surname: json['nazwisko'],
     );
   }
 }
