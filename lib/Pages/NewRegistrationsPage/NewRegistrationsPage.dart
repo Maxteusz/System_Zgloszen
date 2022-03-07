@@ -15,9 +15,11 @@ import '../../Objects/User.dart';
 
 List<User> attachedUsersList = [];
 List<AttachedPeople> _attachedUsersList = [];
-User? selectedOwner;
+User? selectedOwner = null;
 TextEditingController titleController = TextEditingController();
 TextEditingController descriptionController = TextEditingController();
+bool titleValidator = false;
+bool? descriptionValidator;
 
 class NewRegistrationPage extends StatefulWidget {
   NewRegistrationPage({Key? key}) : super(key: key);
@@ -51,19 +53,27 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
     }
   }
    void send() async {
-     Registration registration = new Registration.rere(
+     Registration registration = Registration.rere(
          descriptionController.text, selectedOwner!.Id, 1, "program", titleController.text, _attachedUsersList);
      var response = await http.post(
          Uri.http('10.1.2.74:5009', '/DodajZgloszenie/'),
          headers: {"Content-type": "application/json"},
          body: json.encode(registration.toJson()));
-     print(response.body);
+     print("dfdfdfd" + response.body);
    }
 
   @override
   void initState() {
     super.initState();
     futureUsers = fetchUsers();
+    attachedUsersList.clear();
+    _attachedUsersList.clear();
+    selectedOwner = null;
+    titleController.clear();
+    descriptionController.clear();
+    users.clear();
+    titleValidator = true;
+    descriptionValidator = true;
   }
 
   void convertAttachedPeopleList()
@@ -92,6 +102,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Temat',
+                    errorText:titleValidator == false ? "Temat jest pusty": null
                 ),
               ),
             ),
@@ -117,6 +128,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                     keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
                       hintText: "Opis",
+                      errorText: descriptionValidator == false ? "Temat jest pusty": null,
                       border: OutlineInputBorder(),
                     ))),
             Container(
@@ -136,10 +148,19 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                 height: 40,
                 minWidth: 100,
                 onPressed: () {
-                  convertAttachedPeopleList();
-                          send();
-                          if(selectedOwner != null)
-                            print(selectedOwner?.Id);
+                  setState(() {
+                    if (titleController.text == "") {
+                      titleValidator = false;
+                    }
+                    else if (descriptionController.text == "") {
+                      descriptionValidator = false;
+                    }
+                    else {
+                       convertAttachedPeopleList();
+                       send();
+                       Navigator.pop(context);
+                     }
+                  });
                   },
 
                 child: Text(
@@ -155,10 +176,6 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
         )));
   }
 
-   @override
-  void dispose() {
-users.clear();
-  }
 }
 
 
@@ -222,7 +239,7 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
                 color: Colors.grey,
               ),
             ),
-            itemHeight: 40,
+            itemHeight: 60,
             itemPadding: const EdgeInsets.only(left: 14, right: 14),
             dropdownMaxHeight: 200,
             dropdownPadding: null,
@@ -310,8 +327,6 @@ class DropDownButtonState extends State<DropDownButton> {
           setState(() {
             selectedOwner = value as User;
             log(value.Id.toString());
-
-
           });
         },
         icon: const Icon(
