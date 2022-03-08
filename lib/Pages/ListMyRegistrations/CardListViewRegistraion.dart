@@ -16,29 +16,23 @@ class CardListViewRegistraion extends StatelessWidget {
             margin: EdgeInsets.only(bottom: 10, top: 10),
             child: Row(
               children: [
-                Container(
-                    margin: EdgeInsets.only(left: 10),
-                    child: Text(registraion.id.toString())),
-                Container(
-                    margin: EdgeInsets.only(left: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          registraion.program,
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Container(
-                            margin: EdgeInsets.only(top: 5),
-                            child: Text("registraion.owner.getName())")),
-                      ],
-                    )),
-                Container(
-                    margin: EdgeInsets.only(left: 20),
-                    child: Text(registraion.title)),
+                    Container(
+                        margin: EdgeInsets.only(left: 10),
+                        child: Text(registraion.id.toString())),
+                    Container(
+                        margin: EdgeInsets.only(left: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(child: Text(registraion.owner.Name)),
+                            Container(child: Text(registraion.owner.Surname)),
+                          ],
+                        )),
+                    Container(
+                        margin: EdgeInsets.only(left: 20),
+                        child: Text(registraion.title)),
+
+
               ],
             )));
   }

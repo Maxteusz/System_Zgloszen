@@ -1,9 +1,13 @@
+import 'dart:convert';
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled2/Enums/Pages.dart';
 import 'package:untitled2/Pages/NewRegistrationsPage/NewRegistrationsPage.dart';
 import 'package:untitled2/Objects/Registration.dart';
 import 'Pages/ListMyRegistrations/ListViewRegistrations.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -58,9 +62,30 @@ class MainPage extends State<MyHomePage> {
 
   Pages setPage = Pages.ListRegistrations;
   String title = "Zgłoszenia";
-  List<Registration> registrations = <Registration>[];
+  List<Registration> registrations = [];
+  late Future<List<Registration>> futureRegistrations;
+
+  Future<List<Registration>> fetchRegistrations() async {
+    final response = await http
+        .get(Uri.parse('http://10.1.2.74:5009/PobierzListeZgloszen'));
+
+      if (response.statusCode == 200) {
+        var responseJson = json.decode(response.body);
+        registrations = (responseJson as List).map((p) => Registration.fromJson(p)).toList();
+        return registrations;
+
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
+  }
 
 
+  @override
+  void initState() {
+    futureRegistrations = fetchRegistrations();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,14 +100,28 @@ class MainPage extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(title),
+        title: Row(
+          children: [
+            Text(title),
+            Material(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18.0),
+                side: BorderSide(color: Colors.red),
+              ),
+            )
+          ],
+        ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => NewRegistrationPage()));
+              MaterialPageRoute(builder: (context) => NewRegistrationPage())).then((_) {
+                setState(() {
+                  futureRegistrations = fetchRegistrations();
+                });
+          });
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -94,7 +133,7 @@ class MainPage extends State<MyHomePage> {
         notchMargin: 5,
         child: Row(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+
           children: <Widget>[
             Container(
               padding: EdgeInsets.all(5),
@@ -128,8 +167,21 @@ class MainPage extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: setPage == Pages.ListRegistrations ? ListViewRegistrations(registrations) : null,
+        child: setPage == Pages.ListRegistrations ? FutureBuilder<List<Registration>>(
+          future: futureRegistrations,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListViewRegistrations(registrations);
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            }
+
+            // By default, show a loading spinner.
+            return const CircularProgressIndicator();
+          },
+        ): null
       ),
+
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

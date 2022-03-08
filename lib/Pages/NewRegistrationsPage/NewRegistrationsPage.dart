@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +21,7 @@ TextEditingController titleController = TextEditingController();
 TextEditingController descriptionController = TextEditingController();
 bool titleValidator = false;
 bool? descriptionValidator;
+bool? ownerValidator;
 
 class NewRegistrationPage extends StatefulWidget {
   NewRegistrationPage({Key? key}) : super(key: key);
@@ -29,8 +31,8 @@ class NewRegistrationPage extends StatefulWidget {
     return _NewRegistrationPage();
   }
 }
-
 class _NewRegistrationPage extends State<NewRegistrationPage> {
+
 
    late Future<List<User>> futureUsers;
    late List<User> users = [];
@@ -59,7 +61,6 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
          Uri.http('10.1.2.74:5009', '/DodajZgloszenie/'),
          headers: {"Content-type": "application/json"},
          body: json.encode(registration.toJson()));
-     print("dfdfdfd" + response.body);
    }
 
   @override
@@ -74,6 +75,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
     users.clear();
     titleValidator = true;
     descriptionValidator = true;
+    ownerValidator = true;
   }
 
   void convertAttachedPeopleList()
@@ -83,6 +85,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
         _attachedUsersList.add(new AttachedPeople(Id: 0, RegistrationId: 0, UserId: attachedUsersList[i].Id));
       }
   }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -128,7 +131,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                     keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
                       hintText: "Opis",
-                      errorText: descriptionValidator == false ? "Temat jest pusty": null,
+                      errorText: descriptionValidator == false ? "Brak opisu": null,
                       border: OutlineInputBorder(),
                     ))),
             Container(
@@ -149,12 +152,18 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                 minWidth: 100,
                 onPressed: () {
                   setState(() {
-                    if (titleController.text == "") {
-                      titleValidator = false;
+                    if (titleController.text == "" || descriptionController.text == "" || selectedOwner == null ) {
+                      if (titleController.text == "") {
+                        titleValidator = false;
+                      }
+                       if (descriptionController.text == "") {
+                        descriptionValidator = false;
+                      }
+                       if (selectedOwner == null) {
+                        ownerValidator = false;
+                      }
                     }
-                    else if (descriptionController.text == "") {
-                      descriptionValidator = false;
-                    }
+
                     else {
                        convertAttachedPeopleList();
                        send();
@@ -177,7 +186,6 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
   }
 
 }
-
 
 class AddPeopleDropDownButton extends StatefulWidget {
 
@@ -313,7 +321,10 @@ class DropDownButtonState extends State<DropDownButton> {
     return DropdownButtonHideUnderline(
       child: DropdownButton2(
         isExpanded: true,
-        hint: Text(label),
+        hint: Text(label,
+        style: TextStyle(
+            color: ownerValidator == true ? Colors.grey : Colors.red
+        ),),
         items: users
             .map((item) => DropdownMenuItem<User>(
           value: item,
