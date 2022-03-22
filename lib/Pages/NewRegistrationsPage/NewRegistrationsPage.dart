@@ -7,12 +7,11 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled2/Objects/AttachedPeople.dart';
 import 'package:untitled2/Pages/NewRegistrationsPage/ErrorText.dart';
+import 'package:untitled2/main.dart';
 import 'dart:developer';
 
 import '../../Objects/Registration.dart';
 import '../../Objects/User.dart';
-
-
 
 List<User> attachedUsersList = [];
 List<AttachedPeople> _attachedUsersList = [];
@@ -31,37 +30,49 @@ class NewRegistrationPage extends StatefulWidget {
     return _NewRegistrationPage();
   }
 }
+
 class _NewRegistrationPage extends State<NewRegistrationPage> {
-
-
-   late Future<List<User>> futureUsers;
-   late List<User> users = [];
-
+  late Future<List<User>> futureUsers;
+  late List<User> users = [];
 
   Future<List<User>> fetchUsers() async {
     users.clear();
     final response = await http
-        .get(Uri.parse('http://10.1.2.74:5009/PobierzListeUzytkownikow'));
+        .get(Uri.parse('http://192.168.0.160:5009/PobierzListeUzytkownikow'));
 
     if (response.statusCode == 200) {
       var responseJson = json.decode(response.body);
-      log("Response Body: $responseJson" );
+      log("Response Body: $responseJson");
       users = (responseJson as List).map((p) => User.fromJson(p)).toList();
       return users;
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      throw Exception('Failed to load album');
+      throw Exception('Błąd podczas ładowania listy użytkowników');
     }
   }
-   void send() async {
-     Registration registration = Registration.rere(
-         descriptionController.text, selectedOwner!.Id, 1, "program", titleController.text, _attachedUsersList);
-     var response = await http.post(
-         Uri.http('10.1.2.74:5009', '/DodajZgloszenie/'),
-         headers: {"Content-type": "application/json"},
-         body: json.encode(registration.toJson()));
-   }
+
+  void send() async {
+    Registration registration = Registration.rere(
+        descriptionController.text,
+        selectedOwner!.Id,
+        1,
+        "program",
+        titleController.text,
+        _attachedUsersList);
+    var response = await http.post(
+        Uri.http('192.168.0.160:5009', '/DodajZgloszenie/'),
+        headers: {"Content-type": "application/json"},
+        body: json.encode(registration.toJson()));
+    if (response.statusCode == 200)
+      Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp()))
+          .then((_) {
+        // This block runs when you have come back to the 1st Page from 2nd.
+        setState(() {
+          MainPage().initState();
+        });
+      });
+  }
 
   @override
   void initState() {
@@ -78,117 +89,106 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
     ownerValidator = true;
   }
 
-  void convertAttachedPeopleList()
-  {
-    for (int i = 0; i < attachedUsersList.length ; i++)
-      {
-        _attachedUsersList.add(new AttachedPeople(Id: 0, RegistrationId: 0, UserId: attachedUsersList[i].Id));
-      }
+  void convertAttachedPeopleList() {
+    for (int i = 0; i < attachedUsersList.length; i++) {
+      _attachedUsersList.add(new AttachedPeople(
+          Id: 0, RegistrationId: 0, UserId: attachedUsersList[i].Id));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text("Nowe zgłoszenie"),
-        ),
-        body: SingleChildScrollView(
-            child: Column(
-          children: [
-            Container(
-              margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Temat',
-                    errorText:titleValidator == false ? "Temat jest pusty": null
-                ),
-              ),
-            ),
-           /* Container(
-                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                //child: ProgramsDropDownButton(items, "Wybierz projekt")),*/
-            Container(
-                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: FutureBuilder<List<User>>(
-                    future: futureUsers,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return DropDownButton(snapshot.data!, "Wybierz użytkownika");
-                      } else
-                        return ErrorText();
-                    })),
-            Container(
-                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: TextField(
-                  controller: descriptionController,
-                    minLines: 10,
-                    maxLines: 30,
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      hintText: "Opis",
-                      errorText: descriptionValidator == false ? "Brak opisu": null,
-                      border: OutlineInputBorder(),
-                    ))),
-            Container(
-                margin: EdgeInsets.only(right: 10, left: 10, top: 10),
-                child: FutureBuilder<List<User>>(
-                    future: futureUsers,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return AddPeopleDropDownButton(snapshot.data!, "Dodaj użytkownika");
-                      } else
-                        return  ErrorText();
-                    })
-            ),
-            Container(
-              margin: EdgeInsets.only(bottom: 10, top: 10),
-              child: MaterialButton(
-                height: 40,
-                minWidth: 100,
-                onPressed: () {
-                  setState(() {
-                    if (titleController.text == "" || descriptionController.text == "" || selectedOwner == null ) {
-                      if (titleController.text == "") {
-                        titleValidator = false;
-                      }
-                       if (descriptionController.text == "") {
-                        descriptionValidator = false;
-                      }
-                       if (selectedOwner == null) {
-                        ownerValidator = false;
-                      }
-                    }
-
-                    else {
-                       convertAttachedPeopleList();
-                       send();
-                       Navigator.pop(context);
-                     }
-                  });
-                  },
-
-                child: Text(
-                  "Dodaj",
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                color: Colors.blue,
-              ),
-            )
-          ],
-        )));
+      appBar: AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text("Nowe zgłoszenie"),
+      ),
+      body: SingleChildScrollView(
+          child: FutureBuilder<List<User>>(
+              future: futureUsers,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return SingleChildScrollView(
+                      child: Column(children: [
+                    Container(
+                      margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                      child: TextField(
+                        controller: titleController,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Temat',
+                            errorText: titleValidator == false
+                                ? "Temat jest pusty"
+                                : null),
+                      ),
+                    ),
+                    Container(
+                        margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                        child: DropDownButton(
+                            snapshot.data!, "Wybierz użytkownika")),
+                    Container(
+                        margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                        child: TextField(
+                            controller: descriptionController,
+                            minLines: 10,
+                            maxLines: 30,
+                            keyboardType: TextInputType.multiline,
+                            decoration: InputDecoration(
+                              hintText: "Opis",
+                              errorText: descriptionValidator == false
+                                  ? "Brak opisu"
+                                  : null,
+                              border: OutlineInputBorder(),
+                            ))),
+                    Container(
+                        margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                        child: AddPeopleDropDownButton(
+                            snapshot.data!, "Dodaj użytkownika")),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 10, top: 10),
+                      child: MaterialButton(
+                        height: 40,
+                        minWidth: 100,
+                        onPressed: () {
+                          setState(() {
+                            if (titleController.text == "" ||
+                                descriptionController.text == "" ||
+                                selectedOwner == null) {
+                              if (titleController.text == "") {
+                                titleValidator = false;
+                              }
+                              if (descriptionController.text == "") {
+                                descriptionValidator = false;
+                              }
+                              if (selectedOwner == null) {
+                                ownerValidator = false;
+                              }
+                            } else {
+                              convertAttachedPeopleList();
+                              send();
+                            }
+                          });
+                        },
+                        child: Text(
+                          "Dodaj",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        color: Colors.blue,
+                      ),
+                    )
+                  ]));
+                } else
+                  return ErrorText();
+              })),
+    );
   }
-
 }
 
 class AddPeopleDropDownButton extends StatefulWidget {
-
   List<User> users = [];
   String label;
 
@@ -199,11 +199,11 @@ class AddPeopleDropDownButton extends StatefulWidget {
     return AddPeopleDropDownButtonState(users, label);
   }
 }
+
 class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
   String label;
   User? selectedValue = null;
   List<User> users = [];
-
 
   AddPeopleDropDownButtonState(this.users, this.label);
 
@@ -216,13 +216,12 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
             isExpanded: true,
             hint: Text(label),
             items: users
-                .map((user) =>
-                DropdownMenuItem<User>(
-                  value: user,
-                  child: Text(
-                    user.getName(),
-                  ),
-                ))
+                .map((user) => DropdownMenuItem<User>(
+                      value: user,
+                      child: Text(
+                        user.getName(),
+                      ),
+                    ))
                 .toList(),
             value: selectedValue,
             onChanged: (value) {
@@ -263,18 +262,16 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
               itemCount: attachedUsersList.length,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
-
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: Colors.blue[50],
                   ),
-
                   margin: EdgeInsets.only(left: 10, top: 10, right: 10),
                   child: Row(
                     children: [
                       Container(
-                          margin: EdgeInsets.only(
-                              left: 10, top: 10, bottom: 10),
+                          margin:
+                              EdgeInsets.only(left: 10, top: 10, bottom: 10),
                           child: Text(attachedUsersList[index].getName())),
                       Container(
                           margin: EdgeInsets.only(left: 10),
@@ -300,19 +297,17 @@ class DropDownButton extends StatefulWidget {
   String label;
   List<User> users = [];
 
-
   DropDownButton(this.users, this.label);
 
   @override
   State<StatefulWidget> createState() {
-
     return DropDownButtonState(users, label);
   }
 }
+
 class DropDownButtonState extends State<DropDownButton> {
   String label;
   List<User> users = [];
-
 
   DropDownButtonState(this.users, this.label);
 
@@ -321,17 +316,18 @@ class DropDownButtonState extends State<DropDownButton> {
     return DropdownButtonHideUnderline(
       child: DropdownButton2(
         isExpanded: true,
-        hint: Text(label,
-        style: TextStyle(
-            color: ownerValidator == true ? Colors.grey : Colors.red
-        ),),
+        hint: Text(
+          label,
+          style: TextStyle(
+              color: ownerValidator == true ? Colors.grey : Colors.red),
+        ),
         items: users
             .map((item) => DropdownMenuItem<User>(
-          value: item,
-          child: Text(
-            item.getName(),
-          ),
-        ))
+                  value: item,
+                  child: Text(
+                    item.getName(),
+                  ),
+                ))
             .toList(),
         value: selectedOwner,
         onChanged: (value) {
@@ -365,6 +361,3 @@ class DropDownButtonState extends State<DropDownButton> {
     );
   }
 }
-
-
-

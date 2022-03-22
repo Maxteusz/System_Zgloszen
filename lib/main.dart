@@ -67,7 +67,7 @@ class MainPage extends State<MyHomePage> {
 
   Future<List<Registration>> fetchRegistrations() async {
     final response = await http
-        .get(Uri.parse('http://10.1.2.74:5009/PobierzListeZgloszen'));
+        .get(Uri.parse('http://192.168.0.160:5009/PobierzListeZgloszen'));
 
       if (response.statusCode == 200) {
         var responseJson = json.decode(response.body);
