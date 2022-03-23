@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 
@@ -67,7 +68,9 @@ class MainPage extends State<MyHomePage> {
 
   Future<List<Registration>> fetchRegistrations() async {
     final response = await http
-        .get(Uri.parse('http://192.168.0.160:5009/PobierzListeZgloszen'));
+        .get(Uri.parse('http://192.168.0.160:5009/PobierzListeZgloszen'))
+    .timeout(Duration(seconds: 10),
+      onTimeout: () => throw TimeoutException('Can\'t connect in 10 seconds.'),);;
 
       if (response.statusCode == 200) {
         var responseJson = json.decode(response.body);
@@ -79,6 +82,12 @@ class MainPage extends State<MyHomePage> {
       // then throw an exception.
       throw Exception('Failed to load registrations');
     }
+  }
+
+  void refresh()
+  {
+    registrations.clear();
+    futureRegistrations = fetchRegistrations();
   }
 
 

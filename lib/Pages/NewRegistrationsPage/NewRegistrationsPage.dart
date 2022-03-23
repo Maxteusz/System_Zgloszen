@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled2/Objects/AttachedPeople.dart';
-import 'package:untitled2/Pages/NewRegistrationsPage/ErrorText.dart';
 import 'package:untitled2/main.dart';
 import 'dart:developer';
 
@@ -38,7 +38,9 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
   Future<List<User>> fetchUsers() async {
     users.clear();
     final response = await http
-        .get(Uri.parse('http://192.168.0.160:5009/PobierzListeUzytkownikow'));
+        .get(Uri.parse('http://192.168.0.160:5009/PobierzListeUzytkownikow'))
+    .timeout(Duration(seconds: 10),
+      onTimeout: () => throw TimeoutException('Can\'t connect in 10 seconds.'),);
 
     if (response.statusCode == 200) {
       var responseJson = json.decode(response.body);
@@ -65,14 +67,18 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
         headers: {"Content-type": "application/json"},
         body: json.encode(registration.toJson()));
     if (response.statusCode == 200);
-      Navigator.pop(context, true);
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) {
+          return MyApp();
+        }));
+
   }
-
-
 
   @override
   void initState() {
     super.initState();
+    titleController.clear();
+    descriptionController.clear();
     futureUsers = fetchUsers();
     attachedUsersList.clear();
     _attachedUsersList.clear();
@@ -140,10 +146,10 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                         child: AddPeopleDropDownButton(
                             snapshot.data!, "Dodaj użytkownika")),
                     Container(
-                      margin: EdgeInsets.only(bottom: 10, top: 10),
+                      margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
                       child: MaterialButton(
                         height: 40,
-                        minWidth: 100,
+                        minWidth: double.infinity,
                         onPressed: () {
                           setState(() {
                             if (titleController.text == "" ||
@@ -174,7 +180,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                       ),
                     )
                   ]));
-                } else
+                } else if (snapshot.hasError)
                   return  Center(
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -186,6 +192,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                         size: 60.0,
                       ),
                   ]));
+                return CircularProgressIndicator();
               }
 
               )
@@ -272,7 +279,7 @@ class AddPeopleDropDownButtonState extends State<AddPeopleDropDownButton> {
           ),
         ),
         Container(
-          height: 150,
+          height: 100,
           child: ListView.builder(
               shrinkWrap: true,
               itemCount: attachedUsersList.length,
