@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled2/Objects/AttachedPeople.dart';
-import 'package:untitled2/main.dart';
+import 'package:untitled2/Pages/MainPage.dart';
 import 'dart:developer';
 
 import '../../Objects/Registration.dart';
@@ -22,18 +22,24 @@ bool titleValidator = false;
 bool? descriptionValidator;
 bool? ownerValidator;
 
+
 class NewRegistrationPage extends StatefulWidget {
-  NewRegistrationPage({Key? key}) : super(key: key);
+
+  int registrationId;
+  NewRegistrationPage(this.registrationId);
 
   @override
   State<StatefulWidget> createState() {
-    return _NewRegistrationPage();
+    return _NewRegistrationPage(0);
   }
 }
 
 class _NewRegistrationPage extends State<NewRegistrationPage> {
   late Future<List<User>> futureUsers;
   late List<User> users = [];
+  int registrationId;
+
+  _NewRegistrationPage(this.registrationId);
 
   Future<List<User>> fetchUsers() async {
     users.clear();
@@ -77,15 +83,17 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
   @override
   void initState() {
     super.initState();
-    titleController.clear();
-    descriptionController.clear();
-    futureUsers = fetchUsers();
-    attachedUsersList.clear();
-    _attachedUsersList.clear();
-    selectedOwner = null;
-    titleValidator = true;
-    descriptionValidator = true;
-    ownerValidator = true;
+    if(registrationId == 0) {
+      titleController.clear();
+      descriptionController.clear();
+      futureUsers = fetchUsers();
+      _attachedUsersList.clear();
+      attachedUsersList.clear();
+      selectedOwner = null;
+      titleValidator = true;
+      descriptionValidator = true;
+      ownerValidator = true;
+    }
   }
 
   void convertAttachedPeopleList() {
@@ -200,15 +208,6 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    titleController.clear();
-    descriptionController.clear();
-    selectedOwner = null;
-    users.clear();
-
-  }
 }
 
 class AddPeopleDropDownButton extends StatefulWidget {

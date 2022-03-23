@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled2/Enums/Pages.dart';
 import 'package:untitled2/Pages/NewRegistrationsPage/NewRegistrationsPage.dart';
 import 'package:untitled2/Objects/Registration.dart';
-import 'Pages/ListMyRegistrations/ListViewRegistrations.dart';
+import 'ListMyRegistrations/ListViewRegistrations.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
@@ -126,7 +126,7 @@ class MainPage extends State<MyHomePage> {
         onPressed: () {
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => NewRegistrationPage())).then((_) {
+              MaterialPageRoute(builder: (context) => NewRegistrationPage(0))).then((_) {
 
           });
         },
