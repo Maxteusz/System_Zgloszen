@@ -77,7 +77,7 @@ class MainPage extends State<MyHomePage> {
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      throw Exception('Failed to load album');
+      throw Exception('Failed to load registrations');
     }
   }
 
@@ -118,9 +118,7 @@ class MainPage extends State<MyHomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => NewRegistrationPage())).then((_) {
-                setState(() {
-                  futureRegistrations = fetchRegistrations();
-                });
+
           });
         },
         tooltip: 'Increment',

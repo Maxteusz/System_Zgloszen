@@ -64,15 +64,11 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
         Uri.http('192.168.0.160:5009', '/DodajZgloszenie/'),
         headers: {"Content-type": "application/json"},
         body: json.encode(registration.toJson()));
-    if (response.statusCode == 200)
-      Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp()))
-          .then((_) {
-        // This block runs when you have come back to the 1st Page from 2nd.
-        setState(() {
-          MainPage().initState();
-        });
-      });
+    if (response.statusCode == 200);
+      Navigator.pop(context, true);
   }
+
+
 
   @override
   void initState() {
@@ -81,9 +77,6 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
     attachedUsersList.clear();
     _attachedUsersList.clear();
     selectedOwner = null;
-    titleController.clear();
-    descriptionController.clear();
-    users.clear();
     titleValidator = true;
     descriptionValidator = true;
     ownerValidator = true;
@@ -105,7 +98,7 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
         // the App.build method, and use it to set our appbar title.
         title: Text("Nowe zgłoszenie"),
       ),
-      body: SingleChildScrollView(
+      body: Center(
           child: FutureBuilder<List<User>>(
               future: futureUsers,
               builder: (context, snapshot) {
@@ -182,9 +175,32 @@ class _NewRegistrationPage extends State<NewRegistrationPage> {
                     )
                   ]));
                 } else
-                  return ErrorText();
-              })),
+                  return  Center(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                    children:[
+                      Icon(
+                        Icons.signal_cellular_connected_no_internet_4_bar,
+                        color: Colors.red,
+                        size: 60.0,
+                      ),
+                  ]));
+              }
+
+              )
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    titleController.clear();
+    descriptionController.clear();
+    selectedOwner = null;
+    users.clear();
+
   }
 }
 
